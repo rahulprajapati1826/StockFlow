@@ -17,6 +17,8 @@ from django.http import HttpResponse
 from .models import Store, Bills, Users
 from .form import p_add_form, p_edit_form, register_user, login_user, reset_pass, make_inventory, make_report
 from .decorators import custom_login_required
+import logging
+logger = logging.getLogger(__name__)
 
 @never_cache
 @custom_login_required
@@ -378,30 +380,50 @@ def download_bill_pdf(request):
 
     return response
 
+
 def user_registration(request):
-    
-    if request.method == 'POST':
-        fm = register_user(request.POST)
+    try:
+        if request.method == 'POST':
+            fm = register_user(request.POST)
 
-        name = request.POST.get('Name', '').strip()
-        mobile = request.POST.get('Mobile', '').strip()
-        password = request.POST.get('Password', '')
-        conform_password = request.POST.get('Conform_Password', '')
+            if not fm.is_valid():
+                return render(request, 'register.html', {'fm': fm})
 
-        user = Users.objects.filter(user_mobile=mobile).exists()
-        if user:
-            error = 'User already register. Please login'
-            return render(request, 'register.html', {'fm':fm, 'error':error})
-        if password != conform_password:
-            error = "Password Dose't match!"
-            return render(request, 'register.html', {'fm':fm, 'error':error})
-        else:
-            Users.objects.create(user_name=name, user_mobile=mobile, user_password=password)
-            message = "Account created successfully. Login now"
-            return render(request, 'register.html', {'fm':register_user(), 'message':message})
-    else:
-        fm = register_user()
-        return render(request, 'register.html', {'fm':fm})
+            name = fm.cleaned_data['Name'].strip()
+            mobile = fm.cleaned_data['Mobile'].strip()
+            password = fm.cleaned_data['Password']
+            conform_password = fm.cleaned_data['Conform_Password']
+
+            user = Users.objects.filter(user_mobile=mobile).exists()
+
+            if user:
+                return render(request, 'register.html', {
+                    'fm': fm,
+                    'error': 'User already register. Please login'
+                })
+
+            if password != conform_password:
+                return render(request, 'register.html', {
+                    'fm': fm,
+                    'error': "Password doesn't match!"
+                })
+
+            Users.objects.create(
+                user_name=name,
+                user_mobile=mobile,
+                user_password=password
+            )
+
+            return render(request, 'register.html', {
+                'fm': register_user(),
+                'message': 'Account created successfully. Login now'
+            })
+
+        return render(request, 'register.html', {'fm': register_user()})
+
+    except Exception:
+        logger.exception("USER REGISTRATION FAILED")
+        raise
 
 def user_login(request):
     if request.method == 'POST':
