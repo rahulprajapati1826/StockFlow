@@ -1,0 +1,25 @@
+@import "tailwindcss";
+
+@layer components {
+    .product-form p {
+        @apply space-y-2;
+    }
+
+    .product-form label {
+        @apply mb-2 block text-sm font-semibold text-slate-700;
+    }
+
+    .product-form input,
+    .product-form select,
+    .product-form textarea {
+        @apply w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100;
+    }
+
+    .product-form .helptext {
+        @apply mt-1 block text-xs text-slate-400;
+    }
+
+    .product-form .errorlist {
+        @apply mb-2 list-none text-sm font-medium text-red-600;
+    }
+}

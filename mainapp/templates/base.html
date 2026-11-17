@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Dashboard{% endblock title %}</title>
+    <link rel="stylesheet" href="{% static 'src/output.css' %}">
+    <link rel="stylesheet" href="{% static 'css/navbar.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    {% block extra_css %}{% endblock extra_css %}
+</head>
+<body>
+    <nav class="sticky top-0 z-50 border-b border-slate-200 bg-white/95 shadow-sm backdrop-blur-md">
+        <div class="mx-auto flex h-[76px] max-w-[1600px] items-center justify-between px-5 sm:px-8">
+        <!-- Logo -->
+            <a href="{% url 'product_list' %}" class="flex items-center gap-3">
+                <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-600 to-violet-600 text-xl text-white shadow-lg shadow-indigo-200">
+                    <i class="fa-solid fa-boxes-stacked"></i>
+                </div>
+
+                <div>
+                    <h1 class="text-lg font-extrabold tracking-tight text-slate-800">
+                        Stock<span class="text-indigo-600">Flow</span>
+                    </h1>
+
+                    <p class="text-[10px] font-semibold uppercase tracking-widest text-slate-400">
+                        Inventory System
+                    </p>
+                </div>
+            </a>
+        <!-- Desktop Navigation -->
+        <div class="hidden items-center gap-2 md:flex">
+            <a href="{% url 'product_list' %}"
+               class="nav-link loading-link">
+                <i class="fa-solid fa-house"></i>
+                Dashboard
+            </a>
+
+            <a href="{% url 'product_add' %}"
+               class="nav-link loading-link">
+                <i class="fa-solid fa-plus"></i>
+                Add Product
+            </a>
+
+            <a href="{% url 'make_bill' %}"
+               class="nav-link loading-link">
+                <i class="fa-solid fa-file-invoice"></i>
+                Generate Bill
+            </a>
+            <a href="{% url 'generate-report' %}"
+               class="nav-link loading-link">
+                <i class="fa-solid fa-file-invoice"></i>
+                Sales Report
+            </a>
+
+        </div>
+
+        <!-- Right Section -->
+        <div class="flex items-center gap-3">
+
+            <div class="hidden text-right sm:block">
+                <p class="text-sm font-bold text-slate-800">Welcome Back, {{ request.session.user_name|upper|default:"Guest" }}</p>
+            </div>
+
+            <div class="relative">
+
+                <details class="group">
+
+                    <!-- Profile Letter -->
+                    <summary class="flex h-10 w-10 cursor-pointer list-none items-center justify-center rounded-full bg-indigo-100 font-bold text-indigo-700 ring-2 ring-indigo-200 transition hover:bg-indigo-200">
+                        {{ request.session.user_name|first|upper }}
+                    </summary>
+
+                    <!-- Dropdown -->
+                    <div class="absolute right-0 top-12 z-50 w-48 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl">
+
+                        <div class="border-b border-slate-100 px-4 py-3">
+                            <p class="text-sm font-bold text-slate-800">
+                                {{ request.session.user_name | upper }}
+                            </p>
+                            <p class="text-xs text-slate-400">
+                                Account
+                            </p>
+                        </div>
+
+                        <a href="{% url 'user-logout' %}"
+                            id="logoutLink"
+                            class="flex items-center gap-3 px-4 py-3 text-sm font-semibold text-red-600 transition hover:bg-red-50">
+                            <i class="fa-solid fa-right-from-bracket"></i>
+                            Logout
+                        </a>
+                    </div>
+                </details>
+            </div>
+
+            <!-- Mobile Menu Button -->
+            <button id="menuToggle"
+                    type="button"
+                    class="ml-1 flex h-10 w-10 items-center justify-center rounded-lg bg-slate-100 text-slate-700 transition hover:bg-indigo-100 hover:text-indigo-600 md:hidden">
+
+                <i id="menuIcon" class="fa-solid fa-bars text-lg"></i>
+
+            </button>
+
+        </div>
+
+    </div>
+
+    <!-- Mobile Navigation -->
+    <div id="mobileMenu" class="hidden border-t border-slate-100 bg-white px-5 py-4 md:hidden">
+
+        <div class="flex flex-col gap-2">
+
+            <a href="{% url 'product_list' %}" class="mobile-nav-link">
+                <i class="fa-solid fa-house"></i>
+                Dashboard
+            </a>
+
+            <a href="{% url 'product_add' %}" class="mobile-nav-link loading-link">
+                <i class="fa-solid fa-plus"></i>
+                Add Product
+            </a>
+
+            <a href="{% url 'make_bill' %}" class="mobile-nav-link loading-link">
+                <i class="fa-solid fa-file-invoice"></i>
+                Generate Bill
+            </a>
+            <a href="{% url 'generate-report' %}" class="mobile-nav-link loading-link">
+                <i class="fa-solid fa-file-invoice"></i>
+                Sales Report
+            </a>
+
+        </div>
+
+    </div>
+
+</nav>
+    <!-- Loading Screen -->
+    <div id="pageLoader"
+        class="fixed inset-0 z-[9999] hidden items-center justify-center bg-slate-950/50 backdrop-blur-sm">
+        <div class="rounded-2xl bg-white px-10 py-8 text-center shadow-2xl">
+            <div class="mx-auto mb-5 h-12 w-12 animate-spin rounded-full border-4 border-indigo-100 border-t-indigo-600"></div>
+
+            <h3 class="text-lg font-bold text-slate-800">
+                Please Wait
+            </h3>
+            <p class="mt-2 text-sm text-slate-500">
+                Loading your page...
+            </p>
+        </div>
+    </div>
+    {% block content %}
+    {% endblock content %}
+    
+    <footer class="border-t border-slate-200 bg-white px-5 py-5">
+        <div class="mx-auto flex max-w-[1600px] flex-col items-center justify-between gap-3 sm:flex-row">
+
+            <p class="text-sm text-slate-500">
+                Made by Rahul Prajapati.
+            </p>
+
+            <p class="text-sm text-slate-500">
+                © {% now "Y" %}
+                <span class="font-bold text-indigo-600">StockFlow</span>.
+                All rights reserved.
+            </p>
+
+            <p class="text-sm text-slate-400">
+                Inventory Management System
+                <i class="fa-solid fa-boxes-stacked ml-2 text-indigo-500"></i>
+            </p>
+
+        </div>
+    </footer>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const loader = document.getElementById('pageLoader');
+        const links = document.querySelectorAll('.loading-link');
+        function hideLoader() {
+            loader.classList.add('hidden');
+            loader.classList.remove('flex');
+        }
+        links.forEach(function(link) {
+            link.addEventListener('click', function(event) {
+                if (
+                    event.ctrlKey ||
+                    event.metaKey ||
+                    event.shiftKey ||
+                    event.altKey ||
+                    event.button !== 0 ||
+                    link.target === '_blank'
+                ) {
+                    return;
+                }
+                if (!link.href || link.getAttribute('href') === '#') {
+                    return;
+                }
+                loader.classList.remove('hidden');
+                loader.classList.add('flex');
+            });
+        });
+        window.addEventListener('pageshow', function() {
+            hideLoader();
+        });
+    });
+    </script>
+
+    <script>
+        const menuToggle = document.getElementById('menuToggle');
+        const mobileMenu = document.getElementById('mobileMenu');
+        const menuIcon = document.getElementById('menuIcon');
+        menuToggle.addEventListener('click', function () {
+
+            mobileMenu.classList.toggle('hidden');
+
+            if (mobileMenu.classList.contains('hidden')) {
+                menuIcon.classList.replace('fa-xmark', 'fa-bars');
+            }
+            else {
+                menuIcon.classList.replace('fa-bars', 'fa-xmark');
+            }
+        });
+    </script>
+
+    <div id="logoutLoader"
+        class="fixed inset-0 z-[9999] hidden items-center justify-center bg-slate-950/50 backdrop-blur-sm">
+
+        <div class="rounded-2xl bg-white px-10 py-8 text-center shadow-2xl">
+
+            <div class="mx-auto mb-5 h-14 w-14 animate-spin rounded-full border-4 border-indigo-100 border-t-indigo-600"></div>
+
+            <h3 class="text-lg font-bold text-slate-800">
+                Logging Out...
+            </h3>
+
+            <p class="mt-2 text-sm text-slate-500">
+                Please wait, logging out your account.
+            </p>
+
+        </div>
+    </div>
+    <script>
+        const logoutLink = document.getElementById('logoutLink');
+        const logoutLoader = document.getElementById('logoutLoader');
+
+        logoutLink.addEventListener('click', function () {
+            logoutLoader.classList.remove('hidden');
+            logoutLoader.classList.add('flex');
+        });
+
+        window.addEventListener('pageshow', function () {
+            logoutLoader.classList.add('hidden');
+            logoutLoader.classList.remove('flex');
+        });
+    </script>
+</body>
+</html>

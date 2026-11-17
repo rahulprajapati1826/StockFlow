@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block title %}Update Product{% endblock title %}
+
+{% block content %}
+
+<div class="min-h-[calc(100vh-76px)] bg-slate-50 px-4 py-10 sm:px-8">
+
+    <div class="mx-auto max-w-3xl">
+
+        <!-- Page Heading -->
+        <div class="mb-8">
+            <div class="mb-3 flex items-center gap-2 text-sm font-medium text-slate-500">
+                <a href="{% url 'product_list' %}" class="hover:text-indigo-600">
+                    Products
+                </a>
+                <i class="fa-solid fa-chevron-right text-xs"></i>
+                <span class="text-indigo-600">Update Product</span>
+            </div>
+
+            <h1 class="text-3xl font-extrabold tracking-tight text-slate-800">
+                Update Product
+            </h1>
+
+            <p class="mt-2 text-sm text-slate-500">
+                Modify the existing product details and save your changes.
+            </p>
+        </div>
+
+        <!-- Form Card -->
+        <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+
+            <!-- Card Header -->
+            <div class="flex items-center gap-4 border-b border-slate-100 bg-gradient-to-r from-amber-50 to-orange-50 px-6 py-5">
+
+                <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-500 text-xl text-white shadow-lg shadow-amber-200">
+                    <i class="fa-solid fa-pen-to-square"></i>
+                </div>
+
+                <div>
+                    <h2 class="font-bold text-slate-800">
+                        Edit Product Information
+                    </h2>
+                    <p class="mt-1 text-xs text-slate-500">
+                        Update the required product details
+                    </p>
+                </div>
+
+            </div>
+
+            <!-- Form -->
+            <form method="POST" class="p-6 sm:p-8">
+
+                {% csrf_token %}
+
+                <div class="product-form space-y-5">
+                    {{ form.as_p }}
+                </div>
+
+                <!-- Buttons -->
+                <div class="mt-8 flex flex-col-reverse gap-3 border-t border-slate-100 pt-6 sm:flex-row sm:justify-end">
+
+                    <a href="{% url 'product_list' %}"
+                       class="flex items-center justify-center gap-2 rounded-xl border border-slate-300 px-6 py-3 text-sm font-semibold text-slate-600 transition hover:bg-slate-50">
+
+                        <i class="fa-solid fa-arrow-left"></i>
+                        Cancel
+
+                    </a>
+
+                    <button type="submit"
+                            class="flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 px-7 py-3 text-sm font-bold text-white shadow-lg shadow-orange-200 transition hover:-translate-y-0.5 hover:shadow-xl active:translate-y-0">
+
+                        <i class="fa-solid fa-floppy-disk"></i>
+                        Update Product
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+        <p class="mt-5 text-center text-xs text-slate-400">
+            <i class="fa-solid fa-circle-info mr-1"></i>
+            Make sure your product details are correct before updating.
+        </p>
+
+    </div>
+
+</div>
+
+{% endblock content %}

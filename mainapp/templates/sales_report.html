@@ -1,0 +1,482 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Sales Report | StockFlow</title>
+
+    <link rel="stylesheet" href="{% static 'src/output.css' %}">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background: #f8fafc;
+            color: #1e293b;
+        }
+
+        /* Date Input */
+        #manualDate {
+            width: 100%;
+            height: 52px;
+            padding: 0 16px;
+            border: 1px solid #cbd5e1;
+            border-radius: 12px;
+            background: #fff;
+            color: #1e293b;
+            font-size: 15px;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        #manualDate:focus {
+            border-color: #6366f1;
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.10);
+        }
+
+        #manualDate::placeholder {
+            color: #94a3b8;
+        }
+
+        /* Calendar Button */
+        .calendar-button {
+            position: relative;
+            width: 54px;
+            height: 52px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #cbd5e1;
+            border-radius: 12px;
+            background: white;
+            color: #4f46e5;
+            font-size: 20px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .calendar-button:hover {
+            background: #eef2ff;
+            border-color: #818cf8;
+        }
+
+        .calendar-button {
+            position: relative;
+            width: 54px;
+            height: 52px;
+            overflow: hidden;
+        }
+
+        .calendar-button input[type="date"] {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+            z-index: 2;
+        }
+
+        /* Generate Button */
+        .generate-button {
+            height: 52px;
+            padding: 0 25px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(110deg, #4f46e5, #7c3aed);
+            color: white;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 5px 12px rgba(99, 102, 241, 0.20);
+            transition: all 0.2s ease;
+        }
+
+        .generate-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 9px 18px rgba(99, 102, 241, 0.25);
+        }
+
+        /* Report Table */
+        .report-table {
+            width: 100%;
+            min-width: 900px;
+            border-collapse: collapse;
+        }
+
+        .report-table th {
+            padding: 17px 20px;
+            background: #f8fafc;
+            color: #64748b;
+            font-size: 12px;
+            font-weight: 700;
+            text-align: left;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .report-table td {
+            padding: 17px 20px;
+            border-top: 1px solid #f1f5f9;
+            color: #475569;
+            font-size: 14px;
+            white-space: nowrap;
+        }
+
+        .report-table tbody tr:hover {
+            background: #f8fafc;
+        }
+
+        @media (max-width: 640px) {
+            .generate-button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body class="min-h-screen flex flex-col">
+
+    <main class="mx-auto min-h-screen w-full max-w-[1600px] px-4 py-7 sm:px-7 lg:px-9 flex-1">
+
+        <!-- Breadcrumb -->
+        <div class="mb-6 flex items-center gap-2 text-sm text-slate-500">
+            <i class="fa-solid fa-house"></i>
+            <span><a href="{% url 'product_list' %}">Dashboard</a></span>
+            <i class="fa-solid fa-chevron-right text-xs"></i>
+            <span class="font-semibold text-indigo-600">Sales Report</span>
+        </div>
+
+        <!-- Page Header -->
+        <section class="mb-7 overflow-hidden rounded-2xl bg-gradient-to-r from-indigo-600 to-violet-600 px-7 py-8 text-white shadow-lg sm:px-9">
+
+            <div class="flex flex-col justify-between gap-5 sm:flex-row sm:items-center">
+
+                <div>
+                    <div class="mb-3 inline-flex items-center gap-2 rounded-full bg-white/15 px-4 py-2 text-xs font-bold tracking-wider">
+                        <i class="fa-solid fa-chart-line"></i>
+                        INVENTORY MANAGEMENT
+                    </div>
+
+                    <h1 class="text-3xl font-extrabold tracking-tight sm:text-4xl">
+                        Sales Report
+                    </h1>
+
+                    <p class="mt-3 max-w-xl text-sm leading-6 text-indigo-100 sm:text-base">
+                        Generate daily sales reports and monitor your customer billing records.
+                    </p>
+                </div>
+
+                <div class="flex h-20 w-20 items-center justify-center rounded-2xl border border-white/20 bg-white/15">
+                    <i class="fa-solid fa-file-invoice-dollar text-4xl"></i>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Date Selection Card -->
+        <section class="mb-7 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+
+            <!-- Card Heading -->
+            <div class="mb-7 flex items-center gap-4">
+
+                <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-indigo-100 text-indigo-600">
+                    <i class="fa-solid fa-calendar-days text-2xl"></i>
+                </div>
+
+                <div>
+                    <h2 class="text-xl font-bold text-slate-800">
+                        Generate Daily Report
+                    </h2>
+
+                    <p class="mt-1 text-sm text-slate-500">
+                        Enter a date or select one from the calendar.
+                    </p>
+                </div>
+
+            </div>
+
+            <!-- Form -->
+            <form method="POST">
+
+                {% csrf_token %}
+
+                <div class="max-w-3xl">
+
+                    <label for="manualDate" class="mb-3 block text-sm font-bold text-slate-700">
+                        Select Date
+                        <span class="text-red-500">*</span>
+                    </label>
+
+                    <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
+
+                        <!-- Date Input + Calendar -->
+                        <div class="flex w-full items-center gap-3 sm:max-w-[440px]">
+
+                            <div class="min-w-0 flex-1">
+                                {{ fm.date }}
+                            </div>
+
+                            <label class="calendar-button">
+                                <i class="fa-solid fa-calendar-days pointer-events-none"></i>
+                                <input type="date" id="datePicker">
+                            </label>
+
+                        </div>
+
+                        <!-- Generate -->
+                        <button type="submit" class="generate-button">
+
+                            <i class="fa-solid fa-chart-column"></i>
+                            Generate Report
+
+                        </button>
+
+                    </div>
+
+                    {% if fm.date.errors %}
+                        <p class="mt-2 text-sm font-medium text-red-600">
+                            {{ fm.date.errors }}
+                        </p>
+                    {% endif %}
+
+                    <p class="mt-3 text-xs text-slate-400">
+                        <i class="fa-solid fa-circle-info mr-1 text-indigo-500"></i>
+                        Date format: DD-MM-YYYY
+                    </p>
+
+                </div>
+
+            </form>
+            {% if download_error %}
+                <div class="mt-5 rounded-xl border border-red-200 bg-red-50 p-4 text-red-700">
+                    <i class="fa-solid fa-circle-exclamation mr-2"></i>
+                    Report can't download.
+                </div>
+            {% endif %}
+        </section>
+
+        <!-- Report Result -->
+        {% if report_generated %}
+
+            {% if all_bills %}
+                <a href="{% url 'download_sales_report' %}?date={{ selected_date|date:'Y-m-d' }}"
+                    class="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 px-5 py-3 font-bold text-white shadow-md transition hover:-translate-y-1">
+
+                    <i class="fa-solid fa-file-pdf"></i>
+                    Download PDF Report
+                </a>
+
+                <!-- Bills Table -->
+                <section class="mt-2 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+
+                    <div class="flex flex-col justify-between gap-4 border-b border-slate-100 px-6 py-6 sm:flex-row sm:items-center">
+
+                        <div>
+                            <h2 class="text-lg font-bold text-slate-800">
+                                <i class="fa-solid fa-receipt mr-2 text-indigo-600"></i>
+                                Billing Records
+                            </h2>
+
+                            <p class="mt-1 text-sm text-slate-500">
+                                All transactions for the selected date.
+                            </p>
+                        </div>
+
+                        <div class="inline-flex w-fit items-center gap-2 rounded-full bg-green-50 px-4 py-2 text-sm font-bold text-green-700">
+                            <i class="fa-solid fa-circle-check"></i>
+                            {{ all_bills|length }} Bills Found
+                        </div>
+
+                    </div>
+
+                    <div class="overflow-x-auto">
+
+                        <table class="report-table">
+
+                            <thead>
+                                <tr>
+                                    <th>Customer Name</th>
+                                    <th>Customer Mobile</th>
+                                    <th>Purchase Product</th>
+                                    <th>Quantity</th>
+                                    <th>Bill Date & Time</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+
+                                {% for bill in all_bills %}
+
+                                <tr>
+                                    <td>
+                                        <div class="flex items-center gap-3">
+
+                                            <div class="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-100 font-bold uppercase text-indigo-600">
+                                                {{ bill.customer_name|first }}
+                                            </div>
+
+                                            <span class="font-semibold text-slate-700">
+                                                {{ bill.customer_name }}
+                                            </span>
+
+                                        </div>
+                                    </td>
+
+                                    <td>
+                                        <i class="fa-solid fa-phone mr-2 text-slate-400"></i>
+                                        {{ bill.customer_mobile }}
+                                    </td>
+
+                                    <td class="font-medium text-slate-700">
+                                        {{ bill.purchase_product }}
+                                    </td>
+
+                                    <td>
+                                        <span class="rounded-lg bg-indigo-50 px-3 py-2 font-bold text-indigo-700">
+                                            {{ bill.quantity }}
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        <i class="fa-regular fa-clock mr-1 text-slate-400"></i>
+                                        {{ bill.bill_date|date:"d-m-Y, h:i A" }}
+                                    </td>
+
+                                </tr>
+
+                                {% endfor %}
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                    <div class="border-t border-slate-100 bg-slate-50 px-6 py-4">
+                        <p class="text-sm text-slate-500">
+                            <i class="fa-solid fa-circle-info mr-2 text-indigo-500"></i>
+                            Showing all bills for the selected date.
+                        </p>
+                    </div>
+
+                </section>
+
+            {% else %}
+
+                <!-- No Bills Message: No Table -->
+                <section class="rounded-2xl border border-amber-200 bg-white px-6 py-14 text-center shadow-sm">
+
+                    <div class="mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-2xl bg-amber-50 text-amber-500">
+                        <i class="fa-solid fa-file-circle-xmark text-4xl"></i>
+                    </div>
+
+                    <h2 class="text-xl font-extrabold text-slate-800">
+                        No Bill Generated
+                    </h2>
+
+                    <p class="mx-auto mt-2 max-w-md text-sm leading-6 text-slate-500">
+                        No bills were found for the selected date.
+                        Please try another date to view your sales records.
+                    </p>
+
+                </section>
+
+            {% endif %}
+
+        {% endif %}
+
+    </main>
+    <!-- Footer -->
+    <footer class="border-t border-slate-200 bg-white px-5 py-5">
+        <div class="mx-auto flex max-w-[1600px] flex-col items-center justify-between gap-3 sm:flex-row">
+
+            <p class="text-sm text-slate-500">
+                Made by Rahul Prajapati.
+            </p>
+
+            <p class="text-sm text-slate-500">
+                © {% now "Y" %}
+                <span class="font-bold text-indigo-600">StockFlow</span>.
+                All rights reserved.
+            </p>
+
+            <p class="text-sm text-slate-400">
+                Inventory Management System
+                <i class="fa-solid fa-boxes-stacked ml-2 text-indigo-500"></i>
+            </p>
+
+        </div>
+    </footer>
+
+
+    <!-- Calendar and Manual Date Sync -->
+    <script>
+        const manualDate = document.getElementById('manualDate');
+        const datePicker = document.getElementById('datePicker');
+
+        // Calendar selection -> Manual input
+        datePicker.addEventListener('change', function () {
+
+            if (this.value) {
+                const [year, month, day] = this.value.split('-');
+
+                manualDate.value = `${day}-${month}-${year}`;
+            }
+
+        });
+
+        // Manual input -> Calendar
+        manualDate.addEventListener('input', function () {
+
+            const match = this.value.trim().match(/^(\d{2})-(\d{2})-(\d{4})$/);
+
+            if (match) {
+
+                const day = Number(match[1]);
+                const month = Number(match[2]);
+                const year = Number(match[3]);
+
+                const date = new Date(year, month - 1, day);
+
+                if (
+                    date.getFullYear() === year &&
+                    date.getMonth() === month - 1 &&
+                    date.getDate() === day
+                ) {
+                    datePicker.value =
+                        `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                }
+            }
+
+        });
+
+        // Restore calendar value after form submission
+        if (manualDate.value) {
+
+            const match = manualDate.value.trim().match(/^(\d{2})-(\d{2})-(\d{4})$/);
+
+            if (match) {
+                datePicker.value = `${match[3]}-${match[2]}-${match[1]}`;
+            }
+
+        }
+    </script>
+
+</body>
+</html>
