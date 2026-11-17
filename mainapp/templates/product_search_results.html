@@ -33,10 +33,17 @@
     </td>
 
     <!-- Stock -->
-    <td class="px-6 py-6">
-        <span class="font-bold text-slate-900">
+    <td class="ml-6 px-6 py-6">
+        {% if product.p_quantity <= 10 %}
+            <span class="font-bold text-red-600">
+                {{ product.p_quantity }}
+            </span>
+            <span class="ml-2 text-sm font-bold text-red-600">
+                Available Stock is low!
+            </span>
+        {% else %}
             {{ product.p_quantity }}
-        </span>
+        {% endif %}
     </td>
 
     <!-- Actions -->

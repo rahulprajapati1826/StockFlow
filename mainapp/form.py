@@ -13,16 +13,31 @@ class p_edit_form(forms.Form):
 
 class register_user(forms.Form):
     Name = forms.CharField(max_length=30)
-    Mobile = forms.CharField(max_length=10)
+    Mobile = forms.RegexField(
+        regex=r'^[0-9]{10}$',
+        error_messages={
+            'invalid': 'Mobile number must be 10 digit.'
+        }
+    )
     Password = forms.CharField(widget=forms.PasswordInput())
     Conform_Password = forms.CharField(widget=forms.PasswordInput())
 
 class login_user(forms.Form):
-    Mobile = forms.CharField(max_length=10)
+    Mobile = forms.RegexField(
+        regex=r'^[0-9]{10}$',
+        error_messages={
+            'invalid': 'Mobile number must be 10 digit.'
+        }
+    )
     Password = forms.CharField(widget=forms.PasswordInput())
 
 class reset_pass(forms.Form):
-    Mobile = forms.CharField(max_length=10)
+    Mobile = forms.RegexField(
+            regex=r'^[0-9]{10}$',
+            error_messages={
+                'invalid': 'Mobile number must be 10 digit.'
+            }
+        )
     New_Password = forms.CharField(widget=forms.PasswordInput())
 
 class make_inventory(forms.Form):

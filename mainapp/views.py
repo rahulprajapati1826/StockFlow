@@ -146,7 +146,6 @@ def delete_product(request, pk):
     )
 
 @never_cache
-@custom_login_required
 def make_bill(request):
     user_id = request.session.get('user_id')
     if not user_id:
@@ -218,6 +217,7 @@ def make_bill(request):
                 'customer_mobile': c_mobile,
                 'product_id': product.p_id,
                 'quantity': quantity,
+                'bill_date': bill_date.strftime('%d-%m-%Y %I:%M %p'),
             }
     
             return render(request, 'print_bill.html', {
@@ -227,7 +227,6 @@ def make_bill(request):
     return render(request, 'bill.html')
 
 @never_cache
-@custom_login_required
 def download_bill_pdf(request):
     user_id = request.session.get('user_id')
     if not user_id:
@@ -375,7 +374,7 @@ def download_bill_pdf(request):
         content_type='application/pdf'
     )
 
-    response['Content-Disposition'] = 'attachment; filename="StockFlow_Invoice.pdf"'
+    response['Content-Disposition'] = ('attachment; filename="StockFlow_Invoice.pdf"')
 
     return response
 
@@ -504,11 +503,6 @@ def sales_report(request):
                 bill_date__date=date,
                 user=user
             )
-            print("Bills Found:", data.count())
-            print("Selected User ID:", user.id)
-            print("Available Bill Dates:", list(
-                Bills.objects.filter(user=user).values_list('bill_date', flat=True)
-            ))
 
             report_generated = True
 
